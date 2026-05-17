@@ -1,4 +1,4 @@
-import { Search, Plus, FileBadge2 } from "lucide-react";
+import { Search, RefreshCw, FileBadge2 } from "lucide-react";
 import type { CertStatus } from "@/lib/certificates-data";
 
 type Filter = "all" | "expired" | "warning";
@@ -100,8 +100,8 @@ export function Header({
             onClick={onImport}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-background text-sm font-medium shadow-sm hover:opacity-90 active:scale-[0.98] transition"
           >
-            <Plus className="h-4 w-4" strokeWidth={2.4} />
-            Importar Certificado
+            <RefreshCw className="h-4 w-4" strokeWidth={2.4} />
+            Sincronizar Certificados
           </button>
         </div>
       </div>
