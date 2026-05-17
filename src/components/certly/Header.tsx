@@ -1,4 +1,7 @@
-import { Search, RefreshCw, FileBadge2 } from "lucide-react";
+import { Search, RefreshCw, FileBadge2, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
 import type { CertStatus } from "@/lib/certificates-data";
 
 type Filter = "all" | "expired" | "warning";
@@ -103,6 +106,7 @@ export function Header({
             <RefreshCw className="h-4 w-4" strokeWidth={2.4} />
             Sincronizar Certificados
           </button>
+          <UserMenu />
         </div>
       </div>
     </header>
