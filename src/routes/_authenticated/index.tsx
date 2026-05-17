@@ -10,7 +10,7 @@ import {
   seedCertificates,
 } from "@/lib/certificates-data";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   component: CertlyApp,
 });
 
