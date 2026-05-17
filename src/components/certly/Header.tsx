@@ -129,3 +129,42 @@ function StatusDot({ kind, count }: { kind: CertStatus; count: number }) {
     </span>
   );
 }
+
+function UserMenu() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setEmail(session?.user?.email ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const initial = email?.[0]?.toUpperCase() ?? "?";
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
+
+  return (
+    <div className="flex items-center gap-2 pl-3 ml-1 border-l border-border/60">
+      <div
+        className="h-8 w-8 rounded-full bg-secondary text-foreground flex items-center justify-center text-xs font-semibold"
+        title={email ?? ""}
+      >
+        {initial}
+      </div>
+      <button
+        onClick={logout}
+        className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition"
+        title="Sair"
+        aria-label="Sair"
+      >
+        <LogOut className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
