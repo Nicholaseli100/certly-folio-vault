@@ -35,7 +35,7 @@ export function Header({
         {/* Logo */}
         <div className="flex items-center gap-3 min-w-fit">
           <div className="h-9 w-9 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-sm">
-            <FileBadge2 className="h-4.5 w-4.5" strokeWidth={2.2} />
+            <FileBadge2 className="h-4 w-4" strokeWidth={2.2} />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-semibold tracking-tight text-foreground lowercase">
