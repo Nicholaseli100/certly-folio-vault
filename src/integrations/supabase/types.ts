@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      certificados: {
+        Row: {
+          cnpj_cpf: string
+          created_at: string
+          data_cadastro: string
+          data_emissao: string | null
+          data_vencimento: string
+          email_contato: string
+          id: string
+          nome_responsavel: string
+          notificar_email: boolean
+          notificar_whatsapp: boolean
+          razao_social: string
+          senha_pfx: string
+          updated_at: string
+          url_arquivo_pfx: string | null
+          user_id: string
+          whatsapp_contato: string
+        }
+        Insert: {
+          cnpj_cpf: string
+          created_at?: string
+          data_cadastro?: string
+          data_emissao?: string | null
+          data_vencimento: string
+          email_contato?: string
+          id?: string
+          nome_responsavel?: string
+          notificar_email?: boolean
+          notificar_whatsapp?: boolean
+          razao_social: string
+          senha_pfx?: string
+          updated_at?: string
+          url_arquivo_pfx?: string | null
+          user_id: string
+          whatsapp_contato?: string
+        }
+        Update: {
+          cnpj_cpf?: string
+          created_at?: string
+          data_cadastro?: string
+          data_emissao?: string | null
+          data_vencimento?: string
+          email_contato?: string
+          id?: string
+          nome_responsavel?: string
+          notificar_email?: boolean
+          notificar_whatsapp?: boolean
+          razao_social?: string
+          senha_pfx?: string
+          updated_at?: string
+          url_arquivo_pfx?: string | null
+          user_id?: string
+          whatsapp_contato?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
