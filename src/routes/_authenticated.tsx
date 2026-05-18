@@ -3,8 +3,12 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated")({
-  // MOCK: auth check disabled for preview testing
-  beforeLoad: async () => {},
+  beforeLoad: async ({ location }) => {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      throw redirect({ to: "/login", search: { redirect: location.href } });
+    }
+  },
   component: AuthedLayout,
 });
 

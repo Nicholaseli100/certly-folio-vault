@@ -34,12 +34,22 @@ function LoginPage() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    // MOCK: bypass real auth for preview testing
     setLoading(true);
-    toast.success("Login simulado — entrando no Certly.");
-    setTimeout(() => {
-      navigate({ to: search.redirect ?? "/" });
-    }, 300);
+    try {
+      if (mode === "signin") {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success("Bem-vindo de volta!");
+      } else {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        toast.success("Conta criada com sucesso!");
+      }
+    } catch (err: any) {
+      toast.error(err?.message ?? "Falha na autenticação");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
