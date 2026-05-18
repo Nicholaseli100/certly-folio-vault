@@ -34,30 +34,12 @@ function LoginPage() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email || password.length < 6) {
-      toast.error("Informe um e-mail válido e senha com 6+ caracteres");
-      return;
-    }
+    // MOCK: bypass real auth for preview testing
     setLoading(true);
-    try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/` },
-        });
-        if (error) throw error;
-        toast.success("Conta criada. Bem-vindo ao Certly.");
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Falha na autenticação";
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
+    toast.success("Login simulado — entrando no Certly.");
+    setTimeout(() => {
+      navigate({ to: search.redirect ?? "/" });
+    }, 300);
   };
 
   return (
