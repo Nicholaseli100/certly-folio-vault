@@ -71,6 +71,36 @@ export type Database = {
         }
         Relationships: []
       }
+      perfis_usuarios: {
+        Row: {
+          cnpj_cpf: string
+          created_at: string
+          id: string
+          nome: string
+          nome_escritorio: string
+          updated_at: string
+          url_foto_perfil: string | null
+        }
+        Insert: {
+          cnpj_cpf?: string
+          created_at?: string
+          id: string
+          nome?: string
+          nome_escritorio?: string
+          updated_at?: string
+          url_foto_perfil?: string | null
+        }
+        Update: {
+          cnpj_cpf?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          nome_escritorio?: string
+          updated_at?: string
+          url_foto_perfil?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
