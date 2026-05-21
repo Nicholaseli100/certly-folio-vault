@@ -15,7 +15,9 @@ type Props = {
   setFilter: (f: Filter) => void;
   query: string;
   setQuery: (q: string) => void;
-  onImport: () => void;
+  onSync: () => void;
+  syncing?: boolean;
+  onManualAdd: () => void;
 };
 
 const tabBase =
@@ -29,7 +31,9 @@ export function Header({
   setFilter,
   query,
   setQuery,
-  onImport,
+  onSync,
+  syncing = false,
+  onManualAdd,
 }: Props) {
   const isActive = (f: Filter) => filter === f;
 
@@ -100,13 +104,28 @@ export function Header({
               className="pl-10 pr-4 py-2 w-72 rounded-full bg-secondary/80 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:bg-background transition"
             />
           </div>
-          <button
-            onClick={onImport}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-background text-sm font-medium shadow-sm hover:opacity-90 active:scale-[0.98] transition"
-          >
-            <RefreshCw className="h-4 w-4" strokeWidth={2.4} />
-            Sincronizar Certificados
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onManualAdd}
+              className="inline-flex items-center gap-1 px-3 py-2 rounded-full border border-border/60 bg-background text-xs font-medium text-muted-foreground hover:text-foreground hover:border-border transition"
+              title="Cadastrar certificado manualmente (teste)"
+            >
+              + Adicionar Manual
+            </button>
+            <button
+              type="button"
+              onClick={onSync}
+              disabled={syncing}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-background text-sm font-medium shadow-sm hover:opacity-90 active:scale-[0.98] transition disabled:opacity-60"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`}
+                strokeWidth={2.4}
+              />
+              Sincronizar Certificados
+            </button>
+          </div>
           <UserMenu />
         </div>
       </div>

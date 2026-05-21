@@ -6,6 +6,10 @@ import { Header } from "@/components/certly/Header";
 import { CertificateList } from "@/components/certly/CertificateList";
 import { SideDrawer } from "@/components/certly/SideDrawer";
 import { type Certificate, getStatus } from "@/lib/certificates-data";
+import { createEmptyCertificate, isNewCertificate } from "@/lib/certificate-draft";
+import { encryptSenhaPfx, isEncryptedSenhaPfx } from "@/lib/tauri-crypto";
+import { sincronizarCertificadosLocais, isWindowsLocalCert } from "@/lib/tauri-certs";
+import { localToCertificate } from "@/lib/local-cert-mapper";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/")({
@@ -39,6 +43,7 @@ function CertlyApp() {
   const [openCert, setOpenCert] = useState<Certificate | null>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fetchAll = async () => {
@@ -128,31 +133,135 @@ function CertlyApp() {
     }
   };
 
+  const handleManualAdd = () => {
+    setOpenCert(createEmptyCertificate());
+  };
+
+  const handleSyncLocal = async () => {
+    setSyncing(true);
+    try {
+      const locals = await sincronizarCertificadosLocais();
+      if (locals.length === 0) {
+        toast.info("Nenhum certificado encontrado no repositório Pessoal (MY) do Windows.");
+        return;
+      }
+
+      const mapped = locals.map(localToCertificate);
+      setCertificates((prev) => {
+        const merged = new Map(prev.map((c) => [c.id, c]));
+        for (const cert of mapped) {
+          merged.set(cert.id, cert);
+        }
+        return Array.from(merged.values());
+      });
+      toast.success(
+        `${locals.length} certificado(s) lido(s) do Windows e exibido(s) na lista.`,
+      );
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Falha ao sincronizar certificados locais.";
+      toast.error(msg);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const handleSave = async (updated: Certificate) => {
-    const { error } = await supabase
-      .from("certificados")
-      .update({
-        razao_social: updated.razao_social,
-        cnpj_cpf: updated.cnpj_cpf,
-        data_emissao: updated.data_emissao || null,
-        data_vencimento: updated.data_vencimento,
-        senha_pfx: updated.senha_pfx,
-        nome_responsavel: updated.nome_responsavel,
-        email_contato: updated.email_contato,
-        whatsapp_contato: updated.whatsapp_contato,
-        notificar_email: updated.notificar_email,
-        notificar_whatsapp: updated.notificar_whatsapp,
-      })
-      .eq("id", updated.id);
+    const isNew = isNewCertificate(updated);
+
+    if (isNew) {
+      if (!updated.razao_social.trim() || !updated.cnpj_cpf.trim()) {
+        toast.error("Preencha razão social e CNPJ/CPF.");
+        return;
+      }
+      if (!updated.email_contato.trim()) {
+        toast.error("Preencha o e-mail de contato.");
+        return;
+      }
+      if (!updated.senha_pfx.trim()) {
+        toast.error("Preencha a senha do .pfx para testar a criptografia.");
+        return;
+      }
+    }
+
+    let senhaEncrypted: string;
+    try {
+      if (updated.senha_pfx.trim() && !isEncryptedSenhaPfx(updated.senha_pfx)) {
+        senhaEncrypted = await encryptSenhaPfx(updated.senha_pfx);
+      } else {
+        senhaEncrypted = updated.senha_pfx;
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Falha na criptografia nativa.";
+      toast.error(msg);
+      return;
+    }
+
+    const payload = {
+      razao_social: updated.razao_social.trim(),
+      cnpj_cpf: updated.cnpj_cpf.trim(),
+      data_emissao: updated.data_emissao || null,
+      data_vencimento: updated.data_vencimento,
+      senha_pfx: senhaEncrypted,
+      nome_responsavel: updated.nome_responsavel.trim(),
+      email_contato: updated.email_contato.trim(),
+      whatsapp_contato: updated.whatsapp_contato.trim(),
+      notificar_email: updated.notificar_email,
+      notificar_whatsapp: updated.notificar_whatsapp,
+    };
+
+    if (isWindowsLocalCert(updated.id)) {
+      setCertificates((prev) =>
+        prev.map((c) => (c.id === updated.id ? { ...updated, senha_pfx: senhaEncrypted } : c)),
+      );
+      toast.success("Certificado local atualizado.");
+      return;
+    }
+
+    if (isNew) {
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      if (!userId) {
+        toast.error("Sessão expirada.");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("certificados")
+        .insert({ ...payload, user_id: userId })
+        .select()
+        .single();
+
+      if (error) {
+        toast.error("Erro ao cadastrar: " + error.message);
+        return;
+      }
+
+      const saved = rowToCert(data);
+      setCertificates((prev) => [saved, ...prev]);
+      toast.success("Certificado cadastrado com senha criptografada.");
+      return;
+    }
+
+    const { error } = await supabase.from("certificados").update(payload).eq("id", updated.id);
     if (error) {
       toast.error("Erro ao salvar: " + error.message);
       return;
     }
-    setCertificates((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+
+    setCertificates((prev) =>
+      prev.map((c) => (c.id === updated.id ? { ...updated, senha_pfx: senhaEncrypted } : c)),
+    );
     toast.success("Alterações salvas.");
   };
 
   const handleDelete = async (id: string) => {
+    if (isWindowsLocalCert(id)) {
+      setCertificates((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Certificado removido da lista local.");
+      return;
+    }
+
     const { error } = await supabase.from("certificados").delete().eq("id", id);
     if (error) {
       toast.error("Erro ao remover: " + error.message);
@@ -186,7 +295,9 @@ function CertlyApp() {
         setFilter={setFilter}
         query={query}
         setQuery={setQuery}
-        onImport={() => fileRef.current?.click()}
+        onSync={handleSyncLocal}
+        syncing={syncing}
+        onManualAdd={handleManualAdd}
       />
 
       <input
@@ -221,7 +332,7 @@ function CertlyApp() {
             <p className="text-sm">Carregando certificados…</p>
           </div>
         ) : certificates.length === 0 ? (
-          <EmptyState onImport={() => fileRef.current?.click()} />
+          <EmptyState onSync={handleSyncLocal} syncing={syncing} onManualAdd={handleManualAdd} />
         ) : (
           <CertificateList
             certificates={visible}
@@ -233,19 +344,25 @@ function CertlyApp() {
 
       <SideDrawer cert={openCert} onClose={() => setOpenCert(null)} onSave={handleSave} />
 
-      {(dragging || uploading) && (
+      {(dragging || uploading || syncing) && (
         <div className="fixed inset-0 z-50 bg-foreground/5 backdrop-blur-sm flex items-center justify-center pointer-events-none">
           <div className="bg-background rounded-3xl border-2 border-dashed border-foreground/30 px-12 py-10 shadow-2xl flex flex-col items-center gap-3">
-            {uploading ? (
+            {uploading || syncing ? (
               <Loader2 className="h-10 w-10 text-foreground animate-spin" />
             ) : (
               <UploadCloud className="h-10 w-10 text-foreground" />
             )}
             <p className="text-lg font-semibold text-foreground">
-              {uploading ? "Enviando arquivos…" : "Solte para importar"}
+              {syncing
+                ? "Lendo certificados do Windows…"
+                : uploading
+                  ? "Enviando arquivos…"
+                  : "Solte para importar"}
             </p>
             <p className="text-sm text-muted-foreground">
-              Aceita arquivos .pfx de certificados digitais
+              {syncing
+                ? "Repositório Pessoal (MY)"
+                : "Aceita arquivos .pfx de certificados digitais"}
             </p>
           </div>
         </div>
@@ -254,7 +371,15 @@ function CertlyApp() {
   );
 }
 
-function EmptyState({ onImport }: { onImport: () => void }) {
+function EmptyState({
+  onSync,
+  syncing,
+  onManualAdd,
+}: {
+  onSync: () => void;
+  syncing: boolean;
+  onManualAdd: () => void;
+}) {
   return (
     <div className="mt-16 rounded-3xl border border-dashed border-border bg-card/50 px-10 py-16 flex flex-col items-center text-center">
       <div className="h-14 w-14 rounded-2xl bg-secondary flex items-center justify-center mb-4">
@@ -264,16 +389,30 @@ function EmptyState({ onImport }: { onImport: () => void }) {
         Nenhum certificado cadastrado
       </h2>
       <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-        Sincronize seus primeiros arquivos .pfx para começar a gerenciar os
-        certificados digitais do seu escritório.
+        Sincronize os certificados instalados no Windows ou cadastre manualmente.
       </p>
-      <button
-        onClick={onImport}
-        className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background text-sm font-medium shadow-sm hover:opacity-90 active:scale-[0.98] transition"
-      >
-        <UploadCloud className="h-4 w-4" />
-        Sincronizar certificados
-      </button>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={onManualAdd}
+          className="inline-flex items-center gap-1 px-4 py-2.5 rounded-full border border-border/60 bg-background text-sm font-medium text-muted-foreground hover:text-foreground transition"
+        >
+          + Adicionar Manual
+        </button>
+        <button
+          type="button"
+          onClick={onSync}
+          disabled={syncing}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background text-sm font-medium shadow-sm hover:opacity-90 active:scale-[0.98] transition disabled:opacity-60"
+        >
+          {syncing ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <UploadCloud className="h-4 w-4" />
+          )}
+          Sincronizar certificados
+        </button>
+      </div>
     </div>
   );
 }

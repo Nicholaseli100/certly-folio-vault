@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { X, Building2, ShieldCheck, UserRound, Bell } from "lucide-react";
 import { type Certificate, formatDateBR, getStatus } from "@/lib/certificates-data";
+import { isNewCertificate } from "@/lib/certificate-draft";
 
 type Props = {
   cert: Certificate | null;
@@ -38,7 +39,15 @@ export function SideDrawer({ cert, onClose, onSave }: Props) {
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {draft && <DrawerContent draft={draft} setDraft={setDraft} onClose={onClose} onSave={onSave} />}
+        {draft && (
+          <DrawerContent
+            draft={draft}
+            isNew={isNewCertificate(draft)}
+            setDraft={setDraft}
+            onClose={onClose}
+            onSave={onSave}
+          />
+        )}
       </aside>
     </>
   );
@@ -46,11 +55,13 @@ export function SideDrawer({ cert, onClose, onSave }: Props) {
 
 function DrawerContent({
   draft,
+  isNew,
   setDraft,
   onClose,
   onSave,
 }: {
   draft: Certificate;
+  isNew: boolean;
   setDraft: (c: Certificate) => void;
   onClose: () => void;
   onSave: (c: Certificate) => void;
@@ -77,9 +88,11 @@ function DrawerContent({
               {status.label}
             </div>
             <h2 className="mt-1.5 text-2xl font-semibold tracking-tight text-foreground truncate">
-              {draft.razao_social}
+              {draft.razao_social || (isNew ? "Novo certificado" : "—")}
             </h2>
-            <p className="text-sm text-muted-foreground mt-0.5 tabular-nums">{draft.cnpj_cpf}</p>
+            <p className="text-sm text-muted-foreground mt-0.5 tabular-nums">
+              {draft.cnpj_cpf || (isNew ? "Preencha os dados abaixo" : "—")}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -116,6 +129,7 @@ function DrawerContent({
             label="Senha (.pfx)"
             value={draft.senha_pfx}
             onChange={(v) => update("senha_pfx", v)}
+            type="password"
             mono
           />
           <p className="text-xs text-muted-foreground">
@@ -170,7 +184,7 @@ function DrawerContent({
           }}
           className="px-5 py-2 rounded-full bg-foreground text-background text-sm font-medium shadow-sm hover:opacity-90 active:scale-[0.98] transition"
         >
-          Salvar alterações
+          {isNew ? "Cadastrar certificado" : "Salvar alterações"}
         </button>
       </div>
     </div>
