@@ -2,9 +2,9 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "certly-folio-vault",
   "version": "0.1.0",
-  "identifier": "com.certly.folio-vault",
+  "identifier": "com.certly.desktop",
   "build": {
-    "frontendDist": "../dist",
+    "frontendDist": "../dist/client",
     "devUrl": "http://localhost:8080",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"

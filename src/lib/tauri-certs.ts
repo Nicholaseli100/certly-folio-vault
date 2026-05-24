@@ -5,6 +5,8 @@ export type CertificadoLocal = {
   thumbprint: string;
   subject: string;
   razao_social: string;
+  cnpj_cpf: string;
+  email_contato: string;
   data_emissao: string;
   data_vencimento: string;
 };

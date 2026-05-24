@@ -5,6 +5,8 @@ pub struct CertificadoLocal {
     pub thumbprint: String,
     pub subject: String,
     pub razao_social: String,
+    pub cnpj_cpf: String,
+    pub email_contato: String,
     pub data_emissao: String,
     pub data_vencimento: String,
 }
@@ -12,7 +14,9 @@ pub struct CertificadoLocal {
 #[cfg(target_os = "windows")]
 mod windows_impl {
     use super::CertificadoLocal;
+    use crate::icp_br::extract_icp_fields;
     use chrono::{DateTime, Utc};
+    use std::ffi::c_void;
     use std::ptr;
     use windows_sys::Win32::Foundation::FILETIME;
     use windows_sys::Win32::Security::Cryptography::{
@@ -63,6 +67,8 @@ mod windows_impl {
             .filter(|s| !s.is_empty())
             .unwrap_or_else(|| extract_cn(&subject).unwrap_or_else(|| subject.clone()));
 
+        let icp = extract_icp_fields(ctx, &subject);
+
         let not_before = filetime_to_iso_date((*info).NotBefore);
         let not_after = filetime_to_iso_date((*info).NotAfter);
 
@@ -70,6 +76,8 @@ mod windows_impl {
             thumbprint,
             subject,
             razao_social,
+            cnpj_cpf: icp.cnpj_cpf,
+            email_contato: icp.email_contato,
             data_emissao: not_before,
             data_vencimento: not_after,
         })
@@ -90,7 +98,7 @@ mod windows_impl {
         if CertGetCertificateContextProperty(
             ctx,
             CERT_HASH_PROP_ID,
-            buf.as_mut_ptr(),
+            buf.as_mut_ptr().cast::<c_void>(),
             &mut len,
         ) == 0
         {

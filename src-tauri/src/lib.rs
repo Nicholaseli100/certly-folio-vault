@@ -1,5 +1,6 @@
 mod cert_store;
 mod crypto;
+mod icp_br;
 
 use cert_store::sincronizar_certificados_locais;
 use crypto::encrypt_senha_pfx_command;
