@@ -107,6 +107,15 @@ export function Header({
             <RefreshCw className="h-4 w-4" strokeWidth={2.4} />
             Sincronizar Certificados
           </button>
+          <Link
+            to="/settings/email"
+            className="h-9 w-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition"
+            title="Configurações"
+            aria-label="Configurações"
+            activeProps={{ className: "h-9 w-9 rounded-full flex items-center justify-center text-foreground bg-secondary transition" }}
+          >
+            <Settings className="h-4 w-4" />
+          </Link>
           <UserMenu />
         </div>
       </div>
