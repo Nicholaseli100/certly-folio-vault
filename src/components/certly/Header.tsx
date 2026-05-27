@@ -1,8 +1,8 @@
-import { Search, RefreshCw, FileBadge2, LogOut, Camera, Loader2 } from "lucide-react";
+import { Search, RefreshCw, FileBadge2, LogOut, Camera, Loader2, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import type { CertStatus } from "@/lib/certificates-data";
 
 type Filter = "all" | "expired" | "warning";
