@@ -124,7 +124,6 @@ export function Header({
 }
 
 function StatusDot({ kind, count }: { kind: CertStatus; count: number }) {
-  if (count === 0) return null;
   const color =
     kind === "expired"
       ? "bg-rose-500 text-white"
