@@ -1,4 +1,5 @@
-import { Search, RefreshCw, FileBadge2, LogOut, Camera, Loader2, Settings } from "lucide-react";
+import { Search, RefreshCw, LogOut, Camera, Loader2, Settings } from "lucide-react";
+import cerlyLogo from "@/assets/cerly-logo.png";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
