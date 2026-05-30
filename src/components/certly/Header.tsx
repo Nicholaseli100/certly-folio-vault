@@ -1,4 +1,5 @@
-import { Search, RefreshCw, FileBadge2, LogOut, Camera, Loader2, Settings } from "lucide-react";
+import { Search, RefreshCw, LogOut, Camera, Loader2, Settings } from "lucide-react";
+import cerlyLogo from "@/assets/cerly-logo.png";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,8 +39,8 @@ export function Header({
       <div className="max-w-[1400px] mx-auto px-8 py-5 flex items-center gap-6">
         {/* Logo */}
         <div className="flex items-center gap-3 min-w-fit">
-          <div className="h-9 w-9 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-sm">
-            <FileBadge2 className="h-4 w-4" strokeWidth={2.2} />
+          <div className="h-9 w-9 rounded-2xl bg-[#0f1b3d] flex items-center justify-center shadow-sm overflow-hidden ring-1 ring-amber-400/30">
+            <img src={cerlyLogo} alt="Cerly" className="h-7 w-7 object-contain" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-semibold tracking-tight text-foreground lowercase">
