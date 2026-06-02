@@ -48,16 +48,35 @@ function CertlyApp() {
 
   const fetchAll = async () => {
     setLoading(true);
+    
+    // 1. Busca os certificados que já estão salvos no banco de dados (Nuvem)
+    let list: Certificate[] = [];
     const { data, error } = await supabase
       .from("certificados")
       .select("*")
       .order("data_cadastro", { ascending: false });
+      
     if (error) {
       toast.error("Erro ao carregar certificados: " + error.message);
-      setCertificates([]);
     } else {
-      setCertificates((data ?? []).map(rowToCert));
+      list = (data ?? []).map(rowToCert);
     }
+
+    // 2. Busca silenciosamente os certificados do Windows e mistura com os da Nuvem
+    try {
+      const locals = await sincronizarCertificadosLocais();
+      const mapped = locals.map(localToCertificate);
+      const merged = new Map(list.map((c) => [c.id, c]));
+      for (const cert of mapped) {
+        merged.set(cert.id, cert);
+      }
+      list = Array.from(merged.values());
+    } catch (err) {
+      console.error("Erro na sincronização automática em segundo plano:", err);
+    }
+
+    // 3. Mostra tudo na tela
+    setCertificates(list);
     setLoading(false);
   };
 
@@ -295,9 +314,7 @@ function CertlyApp() {
         setFilter={setFilter}
         query={query}
         setQuery={setQuery}
-        onSync={handleSyncLocal}
-        syncing={syncing}
-        onManualAdd={handleManualAdd}
+        onImport={handleSyncLocal}
       />
 
       <input

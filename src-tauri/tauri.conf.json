@@ -7,7 +7,7 @@
     "frontendDist": "../dist/client",
     "devUrl": "http://localhost:8080",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeBuildCommand": ""
   },
   "app": {
     "windows": [

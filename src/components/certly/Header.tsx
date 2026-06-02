@@ -1,8 +1,9 @@
-import { Search, RefreshCw, FileBadge2, LogOut, Camera, Loader2 } from "lucide-react";
+import { Search, RefreshCw, LogOut, Camera, Loader2, Settings } from "lucide-react";
+import cerlyLogo from "@/assets/cerly-logo.png";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import type { CertStatus } from "@/lib/certificates-data";
 
 type Filter = "all" | "expired" | "warning";
@@ -15,9 +16,7 @@ type Props = {
   setFilter: (f: Filter) => void;
   query: string;
   setQuery: (q: string) => void;
-  onSync: () => void;
-  syncing?: boolean;
-  onManualAdd: () => void;
+  onImport: () => void;
 };
 
 const tabBase =
@@ -31,9 +30,7 @@ export function Header({
   setFilter,
   query,
   setQuery,
-  onSync,
-  syncing = false,
-  onManualAdd,
+  onImport,
 }: Props) {
   const isActive = (f: Filter) => filter === f;
 
@@ -42,8 +39,8 @@ export function Header({
       <div className="max-w-[1400px] mx-auto px-8 py-5 flex items-center gap-6">
         {/* Logo */}
         <div className="flex items-center gap-3 min-w-fit">
-          <div className="h-9 w-9 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-sm">
-            <FileBadge2 className="h-4 w-4" strokeWidth={2.2} />
+          <div className="h-9 w-9 rounded-2xl bg-[#0f1b3d] flex items-center justify-center shadow-sm overflow-hidden ring-1 ring-amber-400/30">
+            <img src={cerlyLogo} alt="Cerly" className="h-7 w-7 object-contain" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-semibold tracking-tight text-foreground lowercase">
@@ -104,28 +101,22 @@ export function Header({
               className="pl-10 pr-4 py-2 w-72 rounded-full bg-secondary/80 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 focus:bg-background transition"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onManualAdd}
-              className="inline-flex items-center gap-1 px-3 py-2 rounded-full border border-border/60 bg-background text-xs font-medium text-muted-foreground hover:text-foreground hover:border-border transition"
-              title="Cadastrar certificado manualmente (teste)"
-            >
-              + Adicionar Manual
-            </button>
-            <button
-              type="button"
-              onClick={onSync}
-              disabled={syncing}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-background text-sm font-medium shadow-sm hover:opacity-90 active:scale-[0.98] transition disabled:opacity-60"
-            >
-              <RefreshCw
-                className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`}
-                strokeWidth={2.4}
-              />
-              Sincronizar Certificados
-            </button>
-          </div>
+          <button
+            onClick={onImport}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-background text-sm font-medium shadow-sm hover:opacity-90 active:scale-[0.98] transition"
+          >
+            <RefreshCw className="h-4 w-4" strokeWidth={2.4} />
+            Sincronizar Certificados
+          </button>
+          <Link
+            to="/settings"
+            className="h-9 w-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition"
+            title="Configurações"
+            aria-label="Configurações"
+            activeProps={{ className: "h-9 w-9 rounded-full flex items-center justify-center text-foreground bg-secondary transition" }}
+          >
+            <Settings className="h-4 w-4" />
+          </Link>
           <UserMenu />
         </div>
       </div>
@@ -134,7 +125,6 @@ export function Header({
 }
 
 function StatusDot({ kind, count }: { kind: CertStatus; count: number }) {
-  if (count === 0) return null;
   const color =
     kind === "expired"
       ? "bg-rose-500 text-white"
