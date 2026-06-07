@@ -1,0 +1,20 @@
+[33m419a46e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mcursor/local-sync-add-716df[m[33m, [m[1;31morigin/cursor/local-sync-add-716df[m[33m)[m Refactor certificate synchronization logic in CertlyApp; enhance Header component with settings link and import functionality. Update Tauri configuration for build command.
+[33md3dc854[m Refactor certificate synchronization logic in CertlyApp; enhance Header component with settings link and import functionality. Update Tauri configuration for build command.
+[33m9050f40[m Add cnpj_cpf and email_contato fields to CertificadoLocal; update related modules and types. Adjust Tauri configuration for frontend path.
+[33m51347e2[m Enhance certificate management features and integrate Tauri support. Updated package.json to include Tauri dependencies and added new functionalities in Header and SideDrawer components for manual certificate addition and synchronization. Improved user experience with dynamic button states and enhanced draft handling in SideDrawer. Updated route handling for SSR compatibility.
+[33m82d1ddd[m[33m ([m[1;32mmain[m[33m)[m Implementou fluxo signup completo
+[33m7392d43[m Changes
+[33m76923d4[m Changes
+[33mc5a2f47[m Changes
+[33mc322257[m Changes
+[33me854f06[m Work in progress
+[33m38c8e4a[m Integrou dados reais com Supabase
+[33m9483e9a[m Changes
+[33m8596eae[m Changes
+[33m37777ea[m Changes
+[33mb9374b7[m Ativou login simulado
+[33m795b211[m Changes
+[33mf579bf1[m Changes
+[33m4ebe0bb[m Work in progress
+[33m1691751[m Adicionou login e perfil
+[33me2b759b[m Changes

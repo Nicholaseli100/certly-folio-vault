@@ -1,13 +1,13 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "certly-folio-vault",
+  "productName": "Certly",
   "version": "0.1.0",
   "identifier": "com.certly.desktop",
   "build": {
-    "frontendDist": "../dist/client",
-    "devUrl": "http://localhost:8080",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": ""
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173"
   },
   "app": {
     "windows": [
@@ -16,16 +16,18 @@
         "width": 1280,
         "height": 800,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "focus": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://*.supabase.io data: blob:"
     }
   },
   "bundle": {
     "active": true,
     "targets": "all",
+    "resources": [],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "build:tauri": "vite build --config vite.config.tauri.ts"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",

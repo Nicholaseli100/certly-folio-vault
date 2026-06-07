@@ -78,7 +78,6 @@ function LoginPage() {
           },
         });
         if (error) throw error;
-        // Sign out so user lands on the login form for first access
         await supabase.auth.signOut();
         setSignupSuccess(true);
       }
@@ -101,8 +100,8 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
-      <div className="w-full max-w-md">
-        <div className="flex items-center gap-3 mb-8 justify-center">
+      <div className="w-full max-w-md relative z-10">
+        <div className="flex items-center gap-3 mb-8 justify-center pointer-events-none">
           <div className="h-11 w-11 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-sm">
             <FileBadge2 className="h-5 w-5" strokeWidth={2.2} />
           </div>
@@ -245,11 +244,11 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground pointer-events-none">
         {label}
       </span>
       <div className="mt-1.5 flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-secondary/70 border border-border/60 focus-within:bg-background focus-within:ring-2 focus-within:ring-ring/40 transition">
-        <span className="text-muted-foreground">{icon}</span>
+        <span className="text-muted-foreground pointer-events-none">{icon}</span>
         {children}
       </div>
     </label>

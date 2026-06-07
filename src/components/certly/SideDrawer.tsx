@@ -26,17 +26,18 @@ export function SideDrawer({ cert, onClose, onSave }: Props) {
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay - AGORA COM INVISIBLE QUANDO FECHADO */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 bg-foreground/10 backdrop-blur-[2px] z-30 transition-opacity duration-300 ${
-          open ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 bg-foreground/10 backdrop-blur-[2px] z-30 transition-all duration-300 ${
+          open ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
       />
-      {/* Drawer */}
+      
+      {/* Drawer - AGORA COM INVISIBLE QUANDO FECHADO */}
       <aside
-        className={`fixed top-0 right-0 h-full w-[35vw] min-w-[460px] bg-background z-40 shadow-[-20px_0_60px_-20px_rgba(15,23,42,0.18)] border-l border-border/60 transition-transform duration-300 ease-out ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 h-full w-[35vw] min-w-[460px] bg-background z-40 shadow-[-20px_0_60px_-20px_rgba(15,23,42,0.18)] border-l border-border/60 transition-all duration-300 ease-out ${
+          open ? "translate-x-0 visible" : "translate-x-full invisible pointer-events-none"
         }`}
       >
         {draft && (

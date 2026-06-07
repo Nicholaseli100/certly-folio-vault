@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) {
+    // Busca a sessão
+    const { data, error } = await supabase.auth.getSession();
+    
+    // Se der erro de rede, ou se não houver sessão ativa, joga pro login
+    if (error || !data.session) {
       throw redirect({ to: "/login", search: { redirect: location.href } });
     }
   },
@@ -16,26 +17,21 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthedLayout() {
   const [ready, setReady] = useState(false);
-  
+  const router = useRouter();
+
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange(() => {});
+    // Fica vigiando: se o usuário deslogar, redireciona ele à força
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        router.navigate({ to: "/login" });
+      }
+    });
+    
     setReady(true);
     return () => sub.subscription.unsubscribe();
-  }, []);
-  
+  }, [router]);
+
   if (!ready) return null;
-  
-  return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
-        <main className="flex-1 flex flex-col h-screen overflow-hidden">
-          <SidebarTrigger className="m-4 absolute z-50 text-foreground" />
-          <div className="flex-1 overflow-y-auto">
-            <Outlet />
-          </div>
-        </main>
-      </div>
-    </SidebarProvider>
-  );
+
+  return <Outlet />;
 }

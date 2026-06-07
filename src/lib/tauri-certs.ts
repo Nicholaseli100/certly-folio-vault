@@ -11,18 +11,24 @@ export type CertificadoLocal = {
   data_vencimento: string;
 };
 
-/** Lê certificados do repositório MY do Windows via Tauri/Rust. */
 export async function sincronizarCertificadosLocais(): Promise<CertificadoLocal[]> {
   if (!isTauriRuntime()) {
     throw new Error(
       "A sincronização com o Windows só está disponível no app desktop (Tauri).",
     );
   }
-  return invoke<CertificadoLocal[]>("sincronizar_certificados_locais");
+
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error("Timeout ao ler certificados do Windows.")), 5000)
+  );
+
+  return Promise.race([
+    invoke<CertificadoLocal[]>("sincronizar_certificados_locais"),
+    timeout,
+  ]);
 }
 
-const CNPJ_IN_SUBJECT =
-  /\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}|\d{14}/;
+const CNPJ_IN_SUBJECT = /\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}|\d{14}/;
 
 export function extractCnpjFromSubject(subject: string): string {
   const match = subject.match(CNPJ_IN_SUBJECT);
