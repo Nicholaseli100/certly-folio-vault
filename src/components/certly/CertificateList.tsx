@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Download, ClipboardCopy, Check, Trash2 } from "lucide-react";
+import { ClipboardCopy, Check, Trash2 } from "lucide-react";
 import { type Certificate, getStatus, formatDateBR } from "@/lib/certificates-data";
+import { ExportCertificateButton } from "./ExportCertificateButton";
 
 type Props = {
   certificates: Certificate[];
