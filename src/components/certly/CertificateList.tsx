@@ -98,9 +98,8 @@ function Row({
 
       {/* Hover actions */}
       <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-card/95 backdrop-blur pl-3">
-        <ActionButton title="Baixar .pfx" onClick={handleDownload}>
-          <Download className="h-4 w-4" />
-        </ActionButton>
+        <ExportCertificateButton cert={cert} nonExportable={nonExportable} />
+
         <ActionButton title={copied ? "Copiado!" : "Copiar senha"} onClick={handleCopy}>
           {copied ? (
             <Check className="h-4 w-4 text-emerald-600" />
