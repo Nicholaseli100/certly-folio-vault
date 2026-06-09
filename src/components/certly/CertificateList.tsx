@@ -62,18 +62,10 @@ function Row({
     setTimeout(() => setCopied(false), 1600);
   };
 
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const blob = new Blob([`fake pfx for ${cert.razao_social}`], {
-      type: "application/x-pkcs12",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${cert.razao_social.replace(/\s+/g, "_")}.pfx`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  // Mock: pretend ~30% of certificates are non-exportable based on id hash
+  const nonExportable =
+    (cert.id?.split("").reduce((a, c) => a + c.charCodeAt(0), 0) ?? 0) % 10 < 3;
+
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
