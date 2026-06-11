@@ -6,7 +6,6 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -34,7 +33,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
@@ -67,8 +65,6 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-
-
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -83,27 +79,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
-      {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" },
+      { rel: "stylesheet", href: appCss },
     ],
   }),
-  shellComponent: RootShell,
->>>>>>> origin/main
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
@@ -111,17 +92,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-
-  // === A VACINA ANTI-TRAVAMENTO (AGORA NO ROOT) ===
   useEffect(() => {
     const rootElement = document.getElementById("root");
-    if (rootElement) {
-      rootElement.removeAttribute("data-tauri-drag-region");
-    }
+    if (rootElement) rootElement.removeAttribute("data-tauri-drag-region");
     document.body.style.pointerEvents = "auto";
     document.body.style.overflow = "auto";
   }, []);
-  // ===============================================
 
   return (
     <QueryClientProvider client={queryClient}>

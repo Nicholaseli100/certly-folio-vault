@@ -100,18 +100,9 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
-
-      <div className="w-full max-w-md relative z-10">
-        <div className="flex items-center gap-3 mb-8 justify-center pointer-events-none">
-          <div className="h-11 w-11 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-sm">
-            <FileBadge2 className="h-5 w-5" strokeWidth={2.2} />
-          </div>
-          <span className="text-2xl font-semibold tracking-tight text-foreground lowercase">
-
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <span className="font-serif text-[1.75rem] leading-none tracking-tight text-foreground lowercase">
-
             certly<span className="text-muted-foreground">.</span>
           </span>
         </div>
@@ -241,15 +232,7 @@ function LoginPage() {
   );
 }
 
-function Field({
-  icon,
-  label,
-  children,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode; }) {
   return (
     <label className="block">
       <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground pointer-events-none">
