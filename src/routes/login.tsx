@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
-import { FileBadge2, Loader2, Mail, Lock, User, Building2, IdCard, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, Lock, User, Building2, IdCard, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Search = { redirect?: string };
