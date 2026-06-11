@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
-import { FileBadge2, Loader2, Mail, Lock, User, Building2, IdCard, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, Lock, User, Building2, IdCard, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Search = { redirect?: string };
@@ -100,12 +100,18 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
+<<<<<<< HEAD
       <div className="w-full max-w-md relative z-10">
         <div className="flex items-center gap-3 mb-8 justify-center pointer-events-none">
           <div className="h-11 w-11 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-sm">
             <FileBadge2 className="h-5 w-5" strokeWidth={2.2} />
           </div>
           <span className="text-2xl font-semibold tracking-tight text-foreground lowercase">
+=======
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-10">
+          <span className="font-serif text-[1.75rem] leading-none tracking-tight text-foreground lowercase">
+>>>>>>> origin/main
             certly<span className="text-muted-foreground">.</span>
           </span>
         </div>
@@ -116,7 +122,7 @@ function LoginPage() {
               <div className="h-14 w-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
                 <CheckCircle2 className="h-7 w-7" strokeWidth={2} />
               </div>
-              <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              <h1 className="text-lg font-medium tracking-tight text-foreground">
                 Cadastro realizado com sucesso!
               </h1>
               <p className="text-sm text-muted-foreground mt-2 max-w-xs">
@@ -131,14 +137,16 @@ function LoginPage() {
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-semibold tracking-tight text-foreground">
-                {mode === "signin" ? "Acesse sua conta" : "Crie sua conta"}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Gerencie certificados digitais do seu escritório.
-              </p>
+              <div className="mb-8">
+                <h1 className="text-lg font-medium tracking-tight text-foreground">
+                  {mode === "signin" ? "Acesse sua conta" : "Crie sua conta"}
+                </h1>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Gerencie certificados digitais do seu escritório.
+                </p>
+              </div>
 
-              <form onSubmit={submit} className="mt-6 space-y-4">
+              <form onSubmit={submit} className="space-y-5">
                 {mode === "signup" && (
                   <>
                     <Field icon={<User className="h-4 w-4" />} label="Nome completo">
