@@ -123,4 +123,66 @@ function UserMenu() {
           .from("perfis_usuarios")
           .select("url_foto_perfil")
           .eq("id", user.id)
-          .maybe
+          .maybeSingle();
+        setAvatarUrl(data?.url_foto_perfil ?? null);
+      }
+      setLoadingAvatar(false);
+    };
+    initUser();
+  }, []);
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
+
+  const handleAvatarFile = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file);
+      if (upErr) throw upErr;
+      
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      await supabase.from("perfis_usuarios").update({ url_foto_perfil: pub.publicUrl }).eq("id", user.id);
+      
+      setAvatarUrl(pub.publicUrl);
+      toast.success("Foto atualizada.");
+    } catch (err: any) {
+      toast.error("Erro: " + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2 pl-3 ml-1 border-l border-border/60">
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleAvatarFile(e.target.files?.[0])} />
+      <button
+        onClick={() => fileRef.current?.click()}
+        disabled={uploading || loadingAvatar}
+        className="group relative h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-xs font-semibold overflow-hidden ring-1 ring-border/60"
+      >
+        {loadingAvatar ? (
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        ) : avatarUrl ? (
+          <img src={avatarUrl} alt="Perfil" className="h-full w-full object-cover" />
+        ) : (
+          <span>?</span>
+        )}
+        <span className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+          <Camera className="h-3.5 w-3.5 text-background" />
+        </span>
+      </button>
+      <button onClick={logout} className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition">
+        <LogOut className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
