@@ -1,10 +1,26 @@
-import { Search, RefreshCw, LogOut, Camera, Loader2, Settings } from "lucide-react";
-import cerlyLogo from "@/assets/cerly-logo.png";
+import {
+  Search,
+  RefreshCw,
+  LogOut,
+  Camera,
+  Loader2,
+  Settings,
+  ShoppingBag,
+  Mail,
+  MessageCircle,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import type { CertStatus } from "@/lib/certificates-data";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 type Filter = "all" | "expired" | "warning";
 
@@ -38,18 +54,13 @@ export function Header({
     <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/70 border-b border-border/60">
       <div className="max-w-[1400px] mx-auto px-8 py-5 flex items-center gap-6">
         {/* Logo */}
-        <div className="flex items-center gap-3 min-w-fit">
-          <div className="h-9 w-9 rounded-2xl bg-[#0f1b3d] flex items-center justify-center shadow-sm overflow-hidden ring-1 ring-amber-400/30">
-            <img src={cerlyLogo} alt="Cerly" className="h-7 w-7 object-contain" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-xl font-semibold tracking-tight text-foreground lowercase">
-              certly<span className="text-muted-foreground">.</span>
-            </span>
-            <span className="text-xs text-muted-foreground tabular-nums">
-              {total} certificados
-            </span>
-          </div>
+        <div className="flex items-baseline gap-2 min-w-fit">
+          <span className="text-2xl font-semibold tracking-tight text-foreground">
+            Certly
+          </span>
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {total} certificados
+          </span>
         </div>
 
         {/* Tabs */}
@@ -108,15 +119,6 @@ export function Header({
             <RefreshCw className="h-4 w-4" strokeWidth={2.4} />
             Sincronizar Certificados
           </button>
-          <Link
-            to="/settings/email"
-            className="h-9 w-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition"
-            title="Configurações"
-            aria-label="Configurações"
-            activeProps={{ className: "h-9 w-9 rounded-full flex items-center justify-center text-foreground bg-secondary transition" }}
-          >
-            <Settings className="h-4 w-4" />
-          </Link>
           <UserMenu />
         </div>
       </div>
@@ -205,8 +207,11 @@ function UserMenu() {
     }
   };
 
+  const itemClass =
+    "gap-3 px-3 py-2 text-sm cursor-pointer rounded-md focus:bg-accent";
+
   return (
-    <div className="flex items-center gap-2 pl-3 ml-1 border-l border-border/60">
+    <div className="flex items-center pl-3 ml-1 border-l border-border/60">
       <input
         ref={fileRef}
         type="file"
@@ -214,34 +219,65 @@ function UserMenu() {
         className="hidden"
         onChange={(e) => handleAvatarFile(e.target.files?.[0])}
       />
-      <button
-        onClick={() => fileRef.current?.click()}
-        disabled={uploading}
-        className="group relative h-8 w-8 rounded-full bg-secondary text-foreground flex items-center justify-center text-xs font-semibold overflow-hidden ring-1 ring-border/60 hover:ring-foreground/30 transition"
-        title={email ? `${email} · alterar foto` : "Alterar foto"}
-        aria-label="Alterar foto de perfil"
-      >
-        {avatarUrl ? (
-          <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <span>{initial}</span>
-        )}
-        <span className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-          {uploading ? (
-            <Loader2 className="h-3.5 w-3.5 text-background animate-spin" />
-          ) : (
-            <Camera className="h-3.5 w-3.5 text-background" />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="group relative h-11 w-11 rounded-full bg-secondary text-foreground flex items-center justify-center text-sm font-semibold overflow-hidden ring-1 ring-border/60 hover:ring-foreground/30 transition"
+            title={email ?? "Conta"}
+            aria-label="Abrir menu da conta"
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span>{initial}</span>
+            )}
+            {uploading && (
+              <span className="absolute inset-0 bg-foreground/40 flex items-center justify-center">
+                <Loader2 className="h-4 w-4 text-background animate-spin" />
+              </span>
+            )}
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" sideOffset={8} className="w-56 p-1.5 rounded-xl">
+          {email && (
+            <>
+              <div className="px-3 py-2 text-xs text-muted-foreground truncate">{email}</div>
+              <DropdownMenuSeparator />
+            </>
           )}
-        </span>
-      </button>
-      <button
-        onClick={logout}
-        className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition"
-        title="Sair"
-        aria-label="Sair"
-      >
-        <LogOut className="h-4 w-4" />
-      </button>
+          <DropdownMenuItem
+            className={itemClass}
+            onSelect={() => fileRef.current?.click()}
+          >
+            <Camera size={18} strokeWidth={1.5} className="text-muted-foreground" />
+            <span>Alterar foto</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className={itemClass} onSelect={() => toast.info("Certly Store em breve.")}>
+            <ShoppingBag size={18} strokeWidth={1.5} className="text-amber-500" />
+            <span>Certly Store</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className={itemClass} onSelect={() => navigate({ to: "/settings/email" })}>
+            <Mail size={18} strokeWidth={1.5} className="text-muted-foreground" />
+            <span>E-mail</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className={itemClass} onSelect={() => toast.info("WhatsApp em breve.")}>
+            <MessageCircle size={18} strokeWidth={1.5} className="text-green-500" />
+            <span>WhatsApp</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className={itemClass} onSelect={() => navigate({ to: "/settings/email" })}>
+            <Settings size={18} strokeWidth={1.5} className="text-muted-foreground" />
+            <span>Configurações</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className={itemClass} onSelect={logout}>
+            <LogOut size={18} strokeWidth={1.5} className="text-red-500" />
+            <span className="text-red-500">Sair</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
