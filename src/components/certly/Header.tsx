@@ -258,7 +258,7 @@ function UserMenu() {
             <span>Certly Store</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className={itemClass} onSelect={() => toast.info("Configurações em breve.")}>
+          <DropdownMenuItem className={itemClass} onSelect={() => navigate({ to: "/settings/email" })}>
             <Mail size={18} strokeWidth={1.5} className="text-muted-foreground" />
             <span>E-mail</span>
           </DropdownMenuItem>
@@ -267,7 +267,7 @@ function UserMenu() {
             <span>WhatsApp</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className={itemClass} onSelect={() => navigate({ to: "/settings/email" })}>
+          <DropdownMenuItem className={itemClass} onSelect={() => toast.info("Configurações em breve.")}>
             <Settings size={18} strokeWidth={1.5} className="text-muted-foreground" />
             <span>Configurações</span>
           </DropdownMenuItem>
